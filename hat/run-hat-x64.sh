@@ -13,17 +13,17 @@ sudo apt install nvidia-cuda-toolkit
 '
 
 echo ""
-echo "Mine: setup env.bash ..."
+echo "====== Mine: setup env.bash ... ======"
 . ./env.bash
 
 echo ""
-echo "Mine: Java home:"
+echo "====== Mine: Java home: ======"
 echo ${JAVA_HOME}
 echo ""
-echo "Mine: which java:"
+echo "====== Mine: which java: ======"
 which java
 echo ""
-echo "Mine: path:"
+echo "====== Mine: path: ======"
 echo ${PATH}
 
 
@@ -32,7 +32,7 @@ echo ${PATH}
 export PATH=${JEXTRACT_HOME}/bin:$PATH
 
 echo ""
-echo "Mine: clean"
+echo "====== Mine: clean ======"
 $JAVA_HOME/bin/java @hat/clean
 
 CUDA_JAVA_DEST_DIR=~/workspace/repos/github/jdk-babylon/hat/extractions/cuda/src/main/java/cuda/
@@ -47,18 +47,18 @@ OPENCL_JAVA_SRC_DIR=~/workspace/repos/github/jextract/samples/opencl/opencl/
 
 
 echo ""
-echo "Mine: build hat artifacts (hat jar + backends and examples) ..."
+echo "====== Mine: build hat artifacts (hat jar + backends and examples) ... ======"
 $JAVA_HOME/bin/java @hat/bld  # this is just a shortcut for below command
 echo ""
-echo "Mine: run hat/bld.java ..."
+echo "====== Mine: run hat/bld.java ... ======"
 # $JAVA_HOME/bin/java --add-modules jdk.incubator.code --enable-preview --source 26 hat/bld.java
 
 echo ""
-echo "Mine: sanity check ..."
+echo "====== Mine: sanity check ... ======"
 $JAVA_HOME/bin/java @hat/sanity
 
 echo ""
-echo "Mine: run hat examples ..."
+echo "====== Mine: run hat examples ... ======"
 #   --class-path build/core-1.0.jar:build/hat-backend-ffi-shared-1.0.jar:build/hat-backend-ffi-opencl-1.0.jar:build/hat-example-mandel-1.0.jar \
 ${JAVA_HOME}/bin/java \
    --add-modules jdk.incubator.code --enable-preview --enable-native-access=ALL-UNNAMED \
@@ -70,18 +70,18 @@ ${JAVA_HOME}/bin/java \
 
 
 echo ""
-echo "Mine: run ffi-opencl mandel ..."
+echo "====== Mine: run ffi-opencl mandel ... ======"
 $JAVA_HOME/bin/java @hat/run ffi-opencl mandel
 
 echo ""
-echo "Mine: run headless ffi-opencl mandel ..."
+echo "====== Mine: run headless ffi-opencl mandel ... ======"
 $JAVA_HOME/bin/java @hat/run headless ffi-opencl mandel
 
 
 echo ""
-echo "Mine: run ffi-cuda mandel ..."
-$JAVA_HOME/bin/java @hat/run justShowCommandLine verbose ffi-cuda mandel
+echo "====== Mine: run ffi-cuda mandel ... ======"
+$JAVA_HOME/bin/java @hat/run verbose ffi-cuda mandel
 
 echo ""
-echo "Mine: run headless ffi-cuda mandel ..."
-$JAVA_HOME/bin/java @hat/run justShowCommandLine verbose headless ffi-cuda mandel
+echo "====== Mine: run headless ffi-cuda mandel ... ======"
+$JAVA_HOME/bin/java @hat/run verbose headless ffi-cuda mandel

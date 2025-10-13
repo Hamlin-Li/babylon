@@ -33,4 +33,6 @@ void main(String[] args) {
  here.buildDir("extractions/opencl/src").remove();
  here.buildDir("extractions/opengl/src").remove();
  here.buildDir("extractions/cuda/src").remove();
+
+ here.buildDir("extractions/cmake-build-debug").remove();
 }

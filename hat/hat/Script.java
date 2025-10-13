@@ -146,7 +146,7 @@ public class Script {
             return XMLFile.of(path().resolve(s));
         }
 
-       }
+    }
 
     public sealed interface FilePathHolder extends PathHolder  {
         default boolean exists() {

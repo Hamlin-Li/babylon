@@ -163,7 +163,9 @@ void main(String[] args) {
         static Script.MavenStyleProject wrap_opencl;
     }
     var dir = Script.DirEntry.current();
+    System.err.println("====== dir: " + dir.path());
     var buildDir = Script.BuildDir.of(dir.path("build")).create();
+    System.err.println("====== buildDir: " + buildDir.path());
 
     Artifacts.core = buildDir.mavenStyleBuild(
             dir.existingDir("core"), "hat-core-1.0.jar"
@@ -175,38 +177,43 @@ void main(String[] args) {
 
 
     var extractionsDir = dir.existingDir("extractions");
+    System.err.println("====== extractionsDir: " + extractionsDir.path());
 
     var extractionsCmakeBuildDir = extractionsDir.buildDir("cmake-build-debug");
     if (!extractionsCmakeBuildDir.exists()) {
-        Script.cmake($ -> $ .verbose(false) .source_dir(extractionsDir) .build_dir(extractionsCmakeBuildDir));
+        Script.cmake($ -> $ .verbose(true) .source_dir(extractionsDir) .build_dir(extractionsCmakeBuildDir));
     }
     Script.cmake($ -> $ .build(extractionsCmakeBuildDir) .target("extract"));
 
     var extraction_opencl_dir = extractionsDir.dir("opencl");
+    System.err.println("====== extraction_opencl_dir: " + extraction_opencl_dir.path());
     if (extraction_opencl_dir.dir("src").exists()) {
         Artifacts.extraction_opencl = buildDir.mavenStyleBuild(
                 extraction_opencl_dir, "hat-extraction-opencl-1.0.jar"
         );
     }else{
-        print("no src for extraction_opencl");
+        println("no src for extraction_opencl");
     }
 
     var extraction_opengl_dir = extractionsDir.dir("opengl");
+    System.err.println("====== extraction_opengl_dir: " + extraction_opengl_dir.path());
     if (extraction_opengl_dir.dir("src").exists()) {
         Artifacts.extraction_opengl = buildDir.mavenStyleBuild(
                 extraction_opengl_dir, "hat-extraction-opengl-1.0.jar"
         );
     }else{
-        print("no src for extraction_opengl");
+        println("no src for extraction_opengl");
     }
 
     var extraction_cuda_dir = extractionsDir.dir("cuda");
+    System.err.println("====== extraction_cuda_dir: " + extraction_cuda_dir.path());
     if (extraction_cuda_dir.dir("src").exists()) {
         Artifacts.extraction_cuda = buildDir.mavenStyleBuild(
                 extraction_cuda_dir, "hat-extraction-cuda-1.0.jar"
         );
+    }else{
+        println("no src for extraction_cuda");
     }
-
 
     var wrapsDir = dir.existingDir("wraps");
 
@@ -253,6 +260,7 @@ void main(String[] args) {
     var backendsDir = dir.existingDir("backends");
 
     var ffiBackendsDir = backendsDir.existingDir("ffi");
+    System.err.println("====== ffiBackendsDir: " + ffiBackendsDir.path());
     Artifacts.backend_ffi_shared = buildDir.mavenStyleBuild(
             ffiBackendsDir.existingDir("shared"), "hat-backend-ffi-shared-1.0.jar", Artifacts.core
     );
@@ -348,7 +356,7 @@ void main(String[] args) {
         }
     }
     if (foundNull){
-        print("incomplete nbody dependencies ");
+        println("incomplete nbody dependencies ");
     }else {
         Artifacts.example_nbody = buildDir.mavenStyleBuild(
                 examplesDir.existingDir("nbody"), "hat-example-nbody-1.0.jar", nbodyDependencies
@@ -356,8 +364,9 @@ void main(String[] args) {
     }
 
     var cmakeBuildDir = buildDir.buildDir("cmake-build-debug");
+    System.err.println("====== cmakeBuildDir: " + cmakeBuildDir.path());
     if (!cmakeBuildDir.exists()) {
-        Script.cmake($ -> $ .verbose(false) .source_dir(ffiBackendsDir) .build_dir(cmakeBuildDir) .copy_to(buildDir));
+        Script.cmake($ -> $ .verbose(true) .source_dir(ffiBackendsDir) .build_dir(cmakeBuildDir) .copy_to(buildDir));
     }
     Script.cmake($ -> $ .build(cmakeBuildDir));
 

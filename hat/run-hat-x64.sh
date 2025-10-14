@@ -1,6 +1,8 @@
 #/bin/bash
 
 
+bash ~/workspace/tools/setup_x64_env.sh
+
 prerequisites='
 sudo apt-get install freeglut3-dev
 sudo apt install intel-opencl-icd
@@ -84,4 +86,5 @@ $JAVA_HOME/bin/java @hat/run verbose ffi-cuda mandel
 
 echo ""
 echo "====== Mine: run headless ffi-cuda mandel ... ======"
-$JAVA_HOME/bin/java @hat/run verbose headless ffi-cuda mandel
+# $JAVA_HOME/bin/java @hat/run verbose headless ffi-cuda mandel
+$JAVA_HOME/bin/java @hat/run verbose headless ffi-cuda squares

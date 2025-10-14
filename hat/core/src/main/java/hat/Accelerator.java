@@ -212,6 +212,7 @@ public class Accelerator implements BufferAllocator, BufferTracker {
      * </pre>
      */
     public void compute(QuotableComputeContextConsumer quotableComputeContextConsumer) {
+        System.out.println("====== Accelerator.compute entry:");
         Quoted quoted = Op.ofQuotable(quotableComputeContextConsumer).orElseThrow();
         JavaOp.LambdaOp lambda = (JavaOp.LambdaOp) quoted.op();
         Method method = OpTk.method(lookup,OpTk.getQuotableTargetInvokeOpWrapper(lambda));

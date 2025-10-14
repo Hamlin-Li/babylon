@@ -364,6 +364,8 @@ public class CudaBackend extends C99FFIBackend {
     }
 
     public CudaBackend(Config config) {
+        System.out.println("====== CudaBackend: config: " + config);
+        System.out.println("====== CudaBackend: isPTX: " + config.isPTX());
         super("cuda_backend", config);
     }
 

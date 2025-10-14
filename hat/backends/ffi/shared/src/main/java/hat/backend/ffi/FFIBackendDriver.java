@@ -165,6 +165,8 @@ public abstract class FFIBackendDriver implements Backend {
     public final BackendBridge backendBridge;
 
     public FFIBackendDriver(String libName, Config config) {
+        System.out.println("====== FFIBackendDriver: libName: " + libName);
+        System.out.println("====== FFIBackendDriver: config: " + config);
         this.ffiLib = new FFILib(libName);
         this.config = config;
         this.backendBridge = new BackendBridge(ffiLib, config);

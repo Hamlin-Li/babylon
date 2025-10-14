@@ -174,6 +174,7 @@ void main(String[] argv) {
           }
           if (config.moduleOp) System.out.println("Using ModuleOp for CallGraphs");
       }
+      System.out.println("====== example: " + config.examplePackageName + ", " + config.exampleClassName);
       Script.java(java -> java
               .enable_preview()
               .verbose(true)

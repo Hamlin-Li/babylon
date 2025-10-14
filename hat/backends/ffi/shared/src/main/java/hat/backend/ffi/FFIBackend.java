@@ -75,8 +75,10 @@ public abstract class FFIBackend extends FFIBackendDriver {
      //   long ns = System.nanoTime();
         backendBridge.computeStart();
         if (config.isINTERPRET()) {
+            System.out.println("====== FFIBackend.dispatchCompute Interpreter entry:");
             Interpreter.invoke(computeContext.accelerator.lookup, computeContext.computeCallGraph.entrypoint.lowered, args);
         } else {
+            System.out.println("====== FFIBackend.dispatchCompute mh entry:");
             try {
                 if (computeContext.computeCallGraph.entrypoint.mh == null) {
                     computeContext.computeCallGraph.entrypoint.mh = BytecodeGenerator.generate(computeContext.accelerator.lookup, computeContext.computeCallGraph.entrypoint.lowered);

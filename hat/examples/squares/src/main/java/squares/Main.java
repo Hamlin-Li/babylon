@@ -59,6 +59,7 @@ public class Main {
 
 
     public static void main(String[] args) {
+        System.out.println("====== squares.Main entry:");
 
         var accelerator = new Accelerator(MethodHandles.lookup(), Backend.FIRST);//new JavaMultiThreadedBackend());
         var arr = S32Array.create(accelerator, 32);

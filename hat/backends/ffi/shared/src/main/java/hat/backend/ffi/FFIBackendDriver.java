@@ -116,7 +116,9 @@ public abstract class FFIBackendDriver implements Backend {
             if (this.getBackend_MPtr.mh == null) {
                 throw new RuntimeException("No getBackend()");
             }
+            System.err.println("====== BackendBridge: getBackend: entry");
             this.handle = getBackend(config.bits());
+            System.err.println("====== BackendBridge: getBackend: successfully");
             this.compile_MPtr = ffiLib.longHandleIntAddressFunc("compile");
             this.info_MPtr = ffiLib.voidHandleFunc("info");
             this.computeStart_MPtr = ffiLib.voidHandleFunc("computeStart");

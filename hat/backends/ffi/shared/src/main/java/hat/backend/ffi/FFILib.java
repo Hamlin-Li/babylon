@@ -193,9 +193,10 @@ public class FFILib {
         boolean nonFinalAvailable = true;
         try {
             Runtime.getRuntime().loadLibrary(name);
+            System.err.println("====== load library successfully: " + name);
         } catch (UnsatisfiedLinkError e) {
             nonFinalAvailable = false;
-            System.err.println("====== Could not load library " + name);
+            System.err.println("====== load library failed: " + name);
         }
         this.available = nonFinalAvailable;
         this.nativeLinker = Linker.nativeLinker();

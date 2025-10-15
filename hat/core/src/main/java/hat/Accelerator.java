@@ -228,7 +228,9 @@ public class Accelerator implements BufferAllocator, BufferTracker {
         Object[] args = OpTk.getQuotableCapturedValues(lambda,quoted, method);
         args[0] = computeContext;
 
+        System.out.println("====== Accelerator.compute backend.dispatchCompute:");
         // now ask the backend to execute
         backend.dispatchCompute(computeContext, args);
+        System.out.println("====== Accelerator.compute backend.dispatchCompute successfull:");
     }
 }

@@ -75,7 +75,7 @@ std::string tmpFileName(uint64_t time, const std::string &suffix) {
 }
 
 CudaBackend::CudaBackend(int configBits)
-    : Backend(new Config(configBits), new CudaQueue(this)), initStatus(cuInit(0)), device(), context() {
+    : Backend(new Config(configBits), new CudaQueue(this)), initStatus(/*cuInit(0)*/CUDA_ERROR_NOT_INITIALIZED), device(), context() {
     int deviceCount = 0;
 
     if (initStatus == CUDA_SUCCESS) {
@@ -88,13 +88,19 @@ CudaBackend::CudaBackend(int configBits)
         std::cout << "CudaBackend context created ok (id=" << context << ")" << std::endl;
         dynamic_cast<CudaQueue *>(queue)->init();
     } else {
+        initStatus = CUDA_SUCCESS;
         CUDA_CHECK(initStatus, "cuInit() failed we seem to have the runtime library but no device");
+        if (false)
+        {
+            int *p = 0;
+            printf("%d\n", *p);
+        }
     }
 }
 
 CudaBackend::~CudaBackend() {
     std::cout << "freeing context" << std::endl;
-    CUDA_CHECK(cuCtxDestroy(context), "cuCtxDestroy");
+    // CUDA_CHECK(cuCtxDestroy(context), "cuCtxDestroy");
 }
 
 void CudaBackend::info() {
@@ -134,10 +140,12 @@ PtxSource *CudaBackend::nvcc(const CudaSource *cudaSource) {
     const std::string cudaPath = tmpFileName(time, ".cu");
     int pid;
     cudaSource->write(cudaPath);
+    std::cerr << "====== cudaPath: " << cudaPath.c_str() << std::endl;
+    std::cerr << "====== ptxPath: " << ptxPath.c_str() << std::endl;
     if ((pid = fork()) == 0) { //child
-        const auto path = "/usr/local/cuda/bin/nvcc";
+        const auto path = "nvcc";
         const char *argv[] {
-            "/usr/local/cuda/bin/nvcc",
+            "nvcc",
             "-ptx",
             "-Wno-deprecated-gpu-targets",
             cudaPath.c_str(),
@@ -161,19 +169,23 @@ PtxSource *CudaBackend::nvcc(const CudaSource *cudaSource) {
 }
 
 CudaBackend::CudaModule *CudaBackend::compile(const CudaSource &cudaSource) {
+    std::cout << "====== CudaBackend::compile: 1" << std::endl;
     return compile(&cudaSource);
 }
 
 CudaBackend::CudaModule *CudaBackend::compile(const CudaSource *cudaSource) {
+    std::cout << "====== CudaBackend::compile: 2" << std::endl;
     const PtxSource *ptxSource = nvcc(cudaSource);
     return compile(ptxSource);
 }
 
 CudaBackend::CudaModule *CudaBackend::compile(const PtxSource &ptxSource) {
+    std::cout << "====== CudaBackend::compile: 3" << std::endl;
     return compile(&ptxSource);
 }
 
 CudaBackend::CudaModule *CudaBackend::compile(const  PtxSource *ptx) {
+    std::cout << "====== CudaBackend::compile: 4" << std::endl;
     CUmodule module;
     if (ptx->text != nullptr) {
         const Log *infLog = new Log(8192);
@@ -193,7 +205,7 @@ CudaBackend::CudaModule *CudaBackend::compile(const  PtxSource *ptx) {
         jitOptions[4] = CU_JIT_GENERATE_LINE_INFO;
         jitOptVals[4] = reinterpret_cast<void *>(1);
 
-        CUDA_CHECK(cuModuleLoadDataEx(&module, ptx->text, optc, jitOptions, (void **) jitOptVals), "cuModuleLoadDataEx");
+        // CUDA_CHECK(cuModuleLoadDataEx(&module, ptx->text, optc, jitOptions, (void **) jitOptVals), "cuModuleLoadDataEx");
 
         if (*infLog->text!='\0'){
            std::cout << "> PTX JIT inflog:" << std::endl << infLog->text << std::endl;
@@ -284,8 +296,9 @@ Backend::CompilationUnit *CudaBackend::compile(const int len, char *source) {
 } */
 
 extern "C" long getBackend(int mode) {
+      std::cout << "====== getBackend() entry:" << std::endl;
     long backendHandle = reinterpret_cast<long>(new CudaBackend(mode));
-    //  std::cout << "getBackend() -> backendHandle=" << std::hex << backendHandle << std::dec << std::endl;
+      std::cout << "getBackend() -> backendHandle=" << std::hex << backendHandle << std::dec << std::endl;
     return backendHandle;
 }
 
@@ -298,6 +311,7 @@ void CudaBackend::computeEnd() {
 }
 
 void CudaBackend::computeStart() {
+    std::cout << "====== CudaBackend::computeStart: computeStart()" << std::endl;
     queue->computeStart();
 }
 
@@ -313,6 +327,7 @@ bool CudaBackend::getBufferFromDeviceIfDirty(void *memorySegment, long memorySeg
             if (config->traceEnqueues | config->traceCopies) {
                 std::cout << "copying buffer from device (from java access) " << std::endl;
             }
+            std::cout << "====== CudaBackend::getBufferFromDeviceIfDirty: wait()" << std::endl;
             queue->wait();
             queue->release();
         } else {

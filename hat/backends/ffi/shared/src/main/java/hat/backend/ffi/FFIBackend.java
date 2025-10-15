@@ -73,6 +73,7 @@ public abstract class FFIBackend extends FFIBackendDriver {
 
         boolean interpret = false;
      //   long ns = System.nanoTime();
+        System.out.println("====== FFIBackend.dispatchCompute: backendBridge.computeStart");
         backendBridge.computeStart();
         if (config.isINTERPRET()) {
             System.out.println("====== FFIBackend.dispatchCompute Interpreter entry:");

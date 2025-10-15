@@ -113,6 +113,7 @@ extern "C" void computeStart(long backendHandle) {
     if (INFO) {
         std::cout << "trampolining through backendHandle to backend.computeStart()" << std::endl;
     }
+    std::cout << "====== extern C computeStart: computeStart()" << std::endl;
     auto *backend = reinterpret_cast<Backend *>(backendHandle);
     backend->computeStart();
 }
@@ -420,6 +421,8 @@ long Backend::CompilationUnit::Kernel::ndrange(void *argArray) {
     if (profilableQueue != nullptr) {
         profilableQueue->marker(Backend::ProfilableQueue::LeaveKernelDispatchBits, name);
     }
+
+    std::cout << "====== Backend::CompilationUnit::Kernel::ndrange: wait()" << std::endl;
     compilationUnit->backend->queue->wait();
     compilationUnit->backend->queue->release();
     if (compilationUnit->backend->config->traceCalls) {

@@ -376,9 +376,11 @@ public class CudaBackend extends C99FFIBackend {
 
     @Override
     public void dispatchKernel(KernelCallGraph kernelCallGraph, NDRange ndRange, Object... args) {
+        System.out.println("====== CudaBackend.dispatchKernel: config.isPTX()? " + config.isPTX());
         CompiledKernel compiledKernel = kernelCallGraphCompiledCodeMap.computeIfAbsent(kernelCallGraph, (_) -> {
             String code = config.isPTX() ? createPTX(kernelCallGraph,  ndRange, args) : createC99(kernelCallGraph,  ndRange, args);
-            if (config.isSHOW_CODE()) {
+            // if (config.isSHOW_CODE()) {
+            if (true) {
                 System.out.println(code);
             }
             var compilationUnit = backendBridge.compile(code);

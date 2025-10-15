@@ -81,10 +81,10 @@ $JAVA_HOME/bin/java @hat/run headless ffi-opencl mandel
 
 
 echo ""
-echo "====== Mine: run ffi-cuda mandel ... ======"
-$JAVA_HOME/bin/java @hat/run verbose ffi-cuda mandel
+echo "====== Mine: run verbose headless ffi-cuda mandel ... ======"
+$JAVA_HOME/bin/java @hat/run verbose headless ffi-cuda mandel
 
 echo ""
-echo "====== Mine: run headless ffi-cuda mandel ... ======"
+echo "====== Mine: run verbose headless ffi-cuda squares ... ======"
 # $JAVA_HOME/bin/java @hat/run verbose headless ffi-cuda mandel
 $JAVA_HOME/bin/java @hat/run verbose headless ffi-cuda squares

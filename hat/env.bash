@@ -58,6 +58,8 @@ else
   ARCH=$(uname -m)
   if [[ "$ARCH" == x86_64 ]]; then
     export archtype=${ARCH}
+  elif  [[ "$ARCH" ==  riscv64 ]]; then
+    export archtype=riscv64
   elif  [[ "$ARCH" ==  aarch64 ]]; then
     export archtype=aarch64
   elif  [[ "$ARCH" == arm64 ]]; then

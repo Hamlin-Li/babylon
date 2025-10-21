@@ -2,6 +2,7 @@
 
 WORKSPACE_ROOT=/home/hamlin/workspace/
 
+source /rivos/rig/bin/rig_env.sh
 
 bash ${WORKSPACE_ROOT}/tools/setup_x64_env.sh
 

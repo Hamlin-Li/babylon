@@ -178,6 +178,7 @@ void main(String[] argv) {
       Script.java(java -> java
               .enable_preview()
               .verbose(true)
+              .vmargs("--add-modules", "jdk.incubator.code")
               .enable_native_access("ALL-UNNAMED")
               .library_path(buildDir)
               .when(config.headless, Script.JavaBuilder::headless)

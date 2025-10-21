@@ -114,7 +114,7 @@ else
     fi
 
     if [[ -d "${BABYLON_JDK_HOME}/build" ]]; then
-      export JAVA_HOME=${BABYLON_JDK_HOME}/build/${ostype}-${archtype}-server-release/jdk
+      export JAVA_HOME=${BABYLON_JDK_HOME}/build/${ostype}-${archtype}-server-release/images/jdk
       if echo ${PATH} | grep ${JAVA_HOME} >/dev/null ;then
          echo "PATH already contains \${JAVA_HOME}/bin"
       else
@@ -122,6 +122,7 @@ else
          echo "Adding \${JAVA_HOME}/bin prefix to PATH, SAFE_PATH contains previous value"
          export PATH=${JAVA_HOME}/bin:${PATH}
       fi
+      echo "JAVA_HOME: " ${JAVA_HOME}
     else
       echo "We expected either:-"
       echo "    \${PWD} to be in a hat subdir of a compiled babylon jdk build" 

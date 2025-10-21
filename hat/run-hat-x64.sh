@@ -1,7 +1,9 @@
 #/bin/bash
 
+WORKSPACE_ROOT=/home/hamlin/workspace/
 
-bash ~/workspace/tools/setup_x64_env.sh
+
+bash ${WORKSPACE_ROOT}/tools/setup_x64_env.sh
 
 prerequisites='
 sudo apt-get install freeglut3-dev
@@ -29,21 +31,21 @@ echo "====== Mine: path: ======"
 echo ${PATH}
 
 
- export JEXTRACT_HOME=/home/hamlin/workspace/tools/jextract-22-x64
-# export JEXTRACT_HOME=/home/hamlin/workspace/repos/github/jextract/build/jextract
+ export JEXTRACT_HOME=${WORKSPACE_ROOT}/tools/jextract-22-x64
+# export JEXTRACT_HOME=${WORKSPACE_ROOT}/repos/github/jextract/build/jextract
 export PATH=${JEXTRACT_HOME}/bin:$PATH
 
 echo ""
 echo "====== Mine: clean ======"
 $JAVA_HOME/bin/java @hat/clean
 
-CUDA_JAVA_DEST_DIR=~/workspace/repos/github/jdk-babylon/hat/extractions/cuda/src/main/java/cuda/
-CUDA_JAVA_SRC_DIR=~/workspace/repos/github/jextract/samples/cuda/cuda/
+CUDA_JAVA_DEST_DIR=${WORKSPACE_ROOT}/repos/github/jdk-babylon/hat/extractions/cuda/src/main/java/cuda/
+CUDA_JAVA_SRC_DIR=${WORKSPACE_ROOT}/repos/github/jextract/samples/cuda/cuda/
 # mkdir -p $CUDA_JAVA_DEST_DIR
 # cp -r $CUDA_JAVA_SRC_DIR/* $CUDA_JAVA_DEST_DIR
 
-OPENCL_JAVA_DEST_DIR=~/workspace/repos/github/jdk-babylon/hat/extractions/cuda/src/main/java/opencl/
-OPENCL_JAVA_SRC_DIR=~/workspace/repos/github/jextract/samples/opencl/opencl/
+OPENCL_JAVA_DEST_DIR=${WORKSPACE_ROOT}/repos/github/jdk-babylon/hat/extractions/cuda/src/main/java/opencl/
+OPENCL_JAVA_SRC_DIR=${WORKSPACE_ROOT}/repos/github/jextract/samples/opencl/opencl/
 # mkdir -p $OPENCL_JAVA_DEST_DIR
 # cp -r $OPENCL_JAVA_SRC_DIR/* $OPENCL_JAVA_DEST_DIR
 

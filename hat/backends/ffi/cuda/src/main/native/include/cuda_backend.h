@@ -101,6 +101,9 @@ public:
 
 class CudaBackend final : public Backend {
 public:
+    static constexpr bool dry_run = true;
+
+public:
 class CudaQueue final : public Backend::Queue {
     public:
         std::thread::id streamCreationThread;

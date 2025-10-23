@@ -75,7 +75,7 @@ std::string tmpFileName(uint64_t time, const std::string &suffix) {
 }
 
 CudaBackend::CudaBackend(int configBits)
-    : Backend(new Config(configBits), new CudaQueue(this)), initStatus(cuInit(0)), device(), context() {
+    : Backend(new Config(configBits), new CudaQueue(this)), initStatus(CudaBackend::dry_run ? CUDA_ERROR_NOT_INITIALIZED : cuInit(0)), device(), context() {
     int deviceCount = 0;
 
     std::cout << "CudaBackend::CudaBackend" << std::endl;
@@ -91,6 +91,7 @@ CudaBackend::CudaBackend(int configBits)
         std::cout << "CudaBackend context created ok (id=" << context << ")" << std::endl;
         dynamic_cast<CudaQueue *>(queue)->init();
     } else {
+        if (CudaBackend::dry_run) { initStatus = CUDA_SUCCESS; }
         std::cout << "CudaBackend::CudaBackend, cuInit fail ..." << std::endl;
         CUDA_CHECK(initStatus, "cuInit() failed we seem to have the runtime library but no device");
         if (false)
@@ -103,7 +104,9 @@ CudaBackend::CudaBackend(int configBits)
 
 CudaBackend::~CudaBackend() {
     std::cout << "freeing context" << std::endl;
+    if (CudaBackend::dry_run) {
     CUDA_CHECK(cuCtxDestroy(context), "cuCtxDestroy");
+    }
 }
 
 void CudaBackend::info() {
@@ -218,7 +221,9 @@ CudaBackend::CudaModule *CudaBackend::compile(const CudaSource *cudaSource) {
     std::cout << "====== CudaBackend::compile: 2" << std::endl;
     const std::string cubinPath = nvcc_cubin(cudaSource);
     CUmodule module;
+    if (CudaBackend::dry_run) {
     CUDA_CHECK(cuModuleLoad(&module, cubinPath.c_str()), "cuModuleLoad");
+    }
     return new CudaModule(this, "my fake ptx source text", "my fake infLog text", true, module);
 }
 
@@ -248,8 +253,9 @@ CudaBackend::CudaModule *CudaBackend::compile(const  PtxSource *ptx) {
         jitOptions[4] = CU_JIT_GENERATE_LINE_INFO;
         jitOptVals[4] = reinterpret_cast<void *>(1);
 
+    if (CudaBackend::dry_run) {
         CUDA_CHECK(cuModuleLoadDataEx(&module, ptx->text, optc, jitOptions, (void **) jitOptVals), "cuModuleLoadDataEx");
-
+    }
         if (*infLog->text!='\0'){
            std::cout << "> PTX JIT inflog:" << std::endl << infLog->text << std::endl;
         }

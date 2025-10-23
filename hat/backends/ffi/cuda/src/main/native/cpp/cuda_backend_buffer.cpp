@@ -38,7 +38,9 @@ CudaBackend::CudaBuffer::CudaBuffer(Backend *backend,  BufferState *bufferState)
     if (cudaBackend->config->traceCalls) {
         std::cout << "CudaBuffer()" << std::endl;
     }
+    if (CudaBackend::dry_run) {
     CUDA_CHECK(cuMemAlloc(&devicePtr, static_cast<size_t>(bufferState->length)), "cuMemAlloc");
+    }
 
     if (cudaBackend->config->traceCalls) {
         std::cout << "devptr=" << std::hex<<  static_cast<long>(devicePtr) << "stream=" <<dynamic_cast<CudaQueue *>(backend->queue)->cuStream <<std::dec <<std::endl;
@@ -55,7 +57,9 @@ CudaBackend::CudaBuffer::~CudaBuffer() {
                 << " thread=" <<thread_id
         <<std::endl;
     }
+    if (CudaBackend::dry_run) {
     CUDA_CHECK(cuMemFree(devicePtr), "cuMemFree");
+    }
     bufferState->vendorPtr= nullptr;
 }
 

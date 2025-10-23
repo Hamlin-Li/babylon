@@ -46,7 +46,9 @@ CudaBackend::CudaModule::CudaKernel *CudaBackend::CudaModule::getCudaKernel(char
 }
 CudaBackend::CudaModule::CudaKernel *CudaBackend::CudaModule::getCudaKernel(int nameLen, char *name) {
     CUfunction function;
+    if (CudaBackend::dry_run) {
     CUDA_CHECK(cuModuleGetFunction(&function, module, name), "cuModuleGetFunction");
+    }
     return new CudaKernel(this,name, function);
 }
 

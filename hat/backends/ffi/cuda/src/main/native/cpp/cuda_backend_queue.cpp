@@ -52,7 +52,7 @@ void CudaBackend::CudaQueue::init(){
     }
 
 void CudaBackend::CudaQueue::wait(){
-    // CUDA_CHECK(cuStreamSynchronize(cuStream), "cuStreamSynchronize");
+    CUDA_CHECK(cuStreamSynchronize(cuStream), "cuStreamSynchronize");
 }
 
 
@@ -71,7 +71,7 @@ void CudaBackend::CudaQueue::release() {
 }
 
 CudaBackend::CudaQueue::~CudaQueue() {
-    // CUDA_CHECK(cuStreamDestroy(cuStream), "cuStreamDestroy");
+    CUDA_CHECK(cuStreamDestroy(cuStream), "cuStreamDestroy");
 }
 
 void CudaBackend::CudaQueue::copyToDevice(Buffer *buffer) {
@@ -90,10 +90,10 @@ void CudaBackend::CudaQueue::copyToDevice(Buffer *buffer) {
                   << std::endl;
     }
 
-//    CUDA_CHECK(cuMemcpyHtoDAsync(cudaBuffer->devicePtr,
-//                    cudaBuffer->bufferState->ptr,
-//                    cudaBuffer->bufferState->length,
-//                    dynamic_cast<CudaQueue*>(backend->queue)->cuStream), "cuMemcpyHtoDAsync");
+    CUDA_CHECK(cuMemcpyHtoDAsync(cudaBuffer->devicePtr,
+                    cudaBuffer->bufferState->ptr,
+                    cudaBuffer->bufferState->length,
+                    dynamic_cast<CudaQueue*>(backend->queue)->cuStream), "cuMemcpyHtoDAsync");
 }
 
 void CudaBackend::CudaQueue::copyFromDevice(Buffer *buffer) {
@@ -112,11 +112,11 @@ void CudaBackend::CudaQueue::copyFromDevice(Buffer *buffer) {
                   << std::endl;
     }
 
-//    CUDA_CHECK(cuMemcpyDtoHAsync(cudaBuffer->bufferState->ptr,
-//                                cudaBuffer->devicePtr,
-//                                cudaBuffer->bufferState->length,
-//                                dynamic_cast<CudaQueue*>(backend->queue)->cuStream),
-//                                "cuMemcpyDtoHAsync");
+    CUDA_CHECK(cuMemcpyDtoHAsync(cudaBuffer->bufferState->ptr,
+                                cudaBuffer->devicePtr,
+                                cudaBuffer->bufferState->length,
+                                dynamic_cast<CudaQueue*>(backend->queue)->cuStream),
+                                "cuMemcpyDtoHAsync");
 
 }
 
@@ -187,5 +187,5 @@ void CudaBackend::CudaQueue::dispatch(KernelContext *kernelContext, CompilationU
                                  cudaKernel->argslist, //
                                  nullptr);
 
-    // CUDA_CHECK(status, "cuLaunchKernel");
+    CUDA_CHECK(status, "cuLaunchKernel");
 }

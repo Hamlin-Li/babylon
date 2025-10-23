@@ -75,10 +75,13 @@ std::string tmpFileName(uint64_t time, const std::string &suffix) {
 }
 
 CudaBackend::CudaBackend(int configBits)
-    : Backend(new Config(configBits), new CudaQueue(this)), initStatus(/*cuInit(0)*/CUDA_ERROR_NOT_INITIALIZED), device(), context() {
+    : Backend(new Config(configBits), new CudaQueue(this)), initStatus(cuInit(0)), device(), context() {
     int deviceCount = 0;
 
+    std::cout << "CudaBackend::CudaBackend" << std::endl;
+
     if (initStatus == CUDA_SUCCESS) {
+        std::cout << "CudaBackend::CudaBackend, cuInit success ..." << std::endl;
         CUDA_CHECK(cuDeviceGetCount(&deviceCount), "cuDeviceGetCount");
         std::cout << "CudaBackend device count = " << deviceCount << std::endl;
         CUDA_CHECK(cuDeviceGet(&device, 0), "cuDeviceGet");
@@ -88,7 +91,7 @@ CudaBackend::CudaBackend(int configBits)
         std::cout << "CudaBackend context created ok (id=" << context << ")" << std::endl;
         dynamic_cast<CudaQueue *>(queue)->init();
     } else {
-        initStatus = CUDA_SUCCESS;
+        std::cout << "CudaBackend::CudaBackend, cuInit fail ..." << std::endl;
         CUDA_CHECK(initStatus, "cuInit() failed we seem to have the runtime library but no device");
         if (false)
         {
@@ -100,7 +103,7 @@ CudaBackend::CudaBackend(int configBits)
 
 CudaBackend::~CudaBackend() {
     std::cout << "freeing context" << std::endl;
-    // CUDA_CHECK(cuCtxDestroy(context), "cuCtxDestroy");
+    CUDA_CHECK(cuCtxDestroy(context), "cuCtxDestroy");
 }
 
 void CudaBackend::info() {
@@ -140,12 +143,10 @@ PtxSource *CudaBackend::nvcc(const CudaSource *cudaSource) {
     const std::string cudaPath = tmpFileName(time, ".cu");
     int pid;
     cudaSource->write(cudaPath);
-    std::cerr << "====== cudaPath: " << cudaPath.c_str() << std::endl;
-    std::cerr << "====== ptxPath: " << ptxPath.c_str() << std::endl;
     if ((pid = fork()) == 0) { //child
-        const auto path = "nvcc";
+        const auto path = "/usr/local/cuda/bin/nvcc";
         const char *argv[] {
-            "nvcc",
+            "/usr/local/cuda/bin/nvcc",
             "-ptx",
             "-Wno-deprecated-gpu-targets",
             cudaPath.c_str(),
@@ -168,6 +169,46 @@ PtxSource *CudaBackend::nvcc(const CudaSource *cudaSource) {
     }
 }
 
+
+std::string CudaBackend::nvcc_cubin(const CudaSource *cudaSource) {
+    const uint64_t time = timeSinceEpochMillisec();
+    const std::string cudaPath = tmpFileName(time, ".cu");
+    const std::string cubinPath = tmpFileName(time, ".cubin");
+    int pid;
+    cudaSource->write(cudaPath);
+    std::cerr << "====== cudaPath: " << cudaPath.c_str() << std::endl;
+    std::cerr << "====== cubinPath: " << cubinPath.c_str() << std::endl;
+    // nvcc tmp1761044704127.cu --cubin
+    // rvcc my.cu --rtc -o my.cubin
+    // cuobjdump --list-elf   tmp1761044704127.cubin
+    if ((pid = fork()) == 0) { //child
+        const auto path = "nvcc";
+        const char *argv[] {
+            path,
+            // "--cubin",
+            "-Wno-deprecated-gpu-targets",
+            cudaPath.c_str(),
+           "--rtc",
+//         "--generate-code=arch=compute_89,code=everett", // RIGRT_HW_VERSION_B0 ? "fargo" : "everett"
+//         "-fPIC",
+//         "--shared",
+            "-o",
+            cubinPath.c_str(),
+            nullptr
+        };
+        const int stat = execvp(path, (char *const *) argv);
+        std::cerr << " rvcc stat = " << stat << " errno=" << errno << " '" << std::strerror(errno) << "'" << std::endl;
+        std::exit(errno);
+    } else if (pid < 0) {// fork failed.
+        std::cerr << "fork of rvcc failed" << std::endl;
+        std::exit(1);
+    } else { //parent
+        int status;
+        pid_t result = wait(&status);
+        return cubinPath;
+    }
+}
+
 CudaBackend::CudaModule *CudaBackend::compile(const CudaSource &cudaSource) {
     std::cout << "====== CudaBackend::compile: 1" << std::endl;
     return compile(&cudaSource);
@@ -175,8 +216,10 @@ CudaBackend::CudaModule *CudaBackend::compile(const CudaSource &cudaSource) {
 
 CudaBackend::CudaModule *CudaBackend::compile(const CudaSource *cudaSource) {
     std::cout << "====== CudaBackend::compile: 2" << std::endl;
-    const PtxSource *ptxSource = nvcc(cudaSource);
-    return compile(ptxSource);
+    const std::string cubinPath = nvcc_cubin(cudaSource);
+    CUmodule module;
+    CUDA_CHECK(cuModuleLoad(&module, cubinPath.c_str()), "cuModuleLoad");
+    return new CudaModule(this, "my fake ptx source text", "my fake infLog text", true, module);
 }
 
 CudaBackend::CudaModule *CudaBackend::compile(const PtxSource &ptxSource) {
@@ -205,7 +248,7 @@ CudaBackend::CudaModule *CudaBackend::compile(const  PtxSource *ptx) {
         jitOptions[4] = CU_JIT_GENERATE_LINE_INFO;
         jitOptVals[4] = reinterpret_cast<void *>(1);
 
-        // CUDA_CHECK(cuModuleLoadDataEx(&module, ptx->text, optc, jitOptions, (void **) jitOptVals), "cuModuleLoadDataEx");
+        CUDA_CHECK(cuModuleLoadDataEx(&module, ptx->text, optc, jitOptions, (void **) jitOptVals), "cuModuleLoadDataEx");
 
         if (*infLog->text!='\0'){
            std::cout << "> PTX JIT inflog:" << std::endl << infLog->text << std::endl;

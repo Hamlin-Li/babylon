@@ -174,6 +174,7 @@ public:
     CudaModule * compile(const PtxSource *ptxSource);
     CudaModule * compile(const PtxSource &ptxSource);
     static PtxSource *nvcc(const CudaSource *cudaSource);
+    static std::string nvcc_cubin(const CudaSource *cudaSource);
     CompilationUnit * compile(int len, char *source) override;
     void computeStart() override;
     void computeEnd() override;
